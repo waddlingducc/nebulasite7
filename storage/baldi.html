@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" style="height:100%">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Baldi</title>
+
+  <!-- Make Baldi asset paths resolve correctly -->
+  <base href="https://cdn.jsdelivr.net/gh/genizy/web-port@main/baldi-remaster/">
+
+  <!-- Unity loader -->
+  <script src="Build/WebGL.loader.js"></script>
+
+  <style>
+    html, body {
+      margin: 0; padding: 0; height: 100%;
+      background: #000; overflow: hidden;
+    }
+    /* Mount node */
+    #game_frame, #unity-canvas { width: 100%; height: 100%; display: block; }
+    /* Pointer Lock hint + hide cursor while locked */
+    #lockHint {
+      position: fixed; left: 50%; top: 16px; transform: translateX(-50%);
+      background: rgba(0,0,0,.6); color: #fff; padding: 8px 12px; border-radius: 8px;
+      font: 600 13px/1.2 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      z-index: 9999; display: none; user-select: none;
+    }
+    .locked, .locked * { cursor: none !important; }
+    #baldi-loading {
+      position: fixed; top: 16px; left: 0; right: 0; text-align: center; color: white;
+      font: 18px/1.2 system-ui; text-shadow: 0 2px 8px rgba(0,0,0,.6); pointer-events: none; z-index: 2;
+    }
+  </style>
+</head>
+<body>
+  <div id="game_frame">
+    <div id="baldi-loading">LOADING…</div>
+    <canvas id="unity-canvas" tabindex="-1"></canvas>
+  </div>
+
+  <!-- Your original split-file loader (kept), trimmed for clarity -->
+  <script>
+    const loadingText = document.getElementById("baldi-loading");
+    let totalBytes = 0, loadedBytes = 0;
+
+    function fmt(b){return b>1e9?(b/1e9).toFixed(2)+" GB":b>1e6?(b/1e6).toFixed(2)+" MB":b>1024?(b/1024).toFixed(2)+" KB":b+" B";}
+    async function headSize(u){try{const r=await fetch(u,{method:"HEAD"});return parseInt(r.headers.get("Content-Length")||"0",10);}catch{return 0;}}
+    async function fetchPart(u){
+      const r = await fetch(u); const rd = r.body.getReader();
+      let chunks=[], rec=0;
+      while(true){const {done,value}=await rd.read(); if(done)break;
+        rec+=value.length; loadedBytes+=value.length; chunks.push(value);
+        if(loadingText){const p=((loadedBytes/Math.max(totalBytes,1))*100).toFixed(1);
+          loadingText.textContent=`LOADING… ${fmt(loadedBytes)} / ${fmt(totalBytes)} (${p}%)`;}}
+      const buf=new Uint8Array(rec); let off=0; for(const c of chunks){buf.set(c,off); off+=c.length;}
+      return buf.buffer;
+    }
+    async function merge(parts){const bufs=await Promise.all(parts.map(fetchPart)); return URL.createObjectURL(new Blob(bufs));}
+    function parts(f,n){return Array.from({length:n},(_,i)=>`${f}.part${i+1}`);}
+
+    (async()=>{
+      const dataParts = parts("Build/WebGL.data", 3);
+      const wasmParts = parts("Build/WebGL.wasm", 3);
+      const all = [...dataParts, ...wasmParts];
+      const sizes = await Promise.all(all.map(headSize)); totalBytes = sizes.reduce((a,b)=>a+b,0);
+
+      const [dataUrl, wasmUrl] = await Promise.all([merge(dataParts), merge(wasmParts)]);
+      createUnityInstance(document.getElementById("unity-canvas"), {
+        dataUrl, frameworkUrl: "Build/WebGL.framework.js", codeUrl: wasmUrl,
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "Basically Games",
+        productName: "Baldi's Basics Classic Remastered",
+        productVersion: "1.1",
+      }).then(()=>{loadingText?.remove();});
+    })();
+  </script>
+
+  <!-- Pointer Lock (click canvas to lock) -->
+  <div id="lockHint">Click the game to lock the mouse. Press Esc to unlock.</div>
+  <script>
+    (function () {
+      const hint = document.getElementById('lockHint');
+
+      function showHint(msg, ms=2500){
+        hint.textContent = msg; hint.style.display = 'block';
+        clearTimeout(showHint._t); showHint._t = setTimeout(()=>hint.style.display='none', ms);
+      }
+      function onLockChange(canvas){
+        const locked = (document.pointerLockElement || document.mozPointerLockElement) === canvas;
+        document.body.classList.toggle('locked', locked);
+        if (!locked) showHint("Mouse unlocked (Esc). Click game to lock again.");
+      }
+      function attach(canvas){
+        if (!canvas || canvas._plAttached) return;
+        canvas._plAttached = true;
+        canvas.addEventListener('click', ()=> (canvas.requestPointerLock || canvas.mozRequestPointerLock)?.call(canvas));
+        document.addEventListener('pointerlockchange', ()=> onLockChange(canvas));
+        document.addEventListener('mozpointerlockchange', ()=> onLockChange(canvas));
+        showHint("Click the game to lock the mouse. Press Esc to unlock.");
+      }
+
+      // Canvas exists immediately for this build
+      const c = document.getElementById('unity-canvas');
+      if (c) attach(c);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>‎</title>
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap" rel="stylesheet">
+
+  <!-- Google Ads (load ONCE per page) -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2366308143645027" crossorigin="anonymous"></script>
+
+  <style>
+    html, body {
+      margin: 0; padding: 0;
+      height: 100%; overflow: hidden;
+      background: #000; /* real background set via JS to absolute URL */
+    }
+
+    /* Nav bar */
+    nav {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 7vw;
+      display: flex; align-items: center;
+      backdrop-filter: blur(10px) saturate(200%) brightness(70%);
+      padding: 0 1%;
+      z-index: 10;
+    }
+    nav img { width: 95px; margin-right: 1%; border-radius: 1vw; }
+    nav h3 {
+      font-size: 4vw; font-weight: 800; margin: 0;
+      color: white; font-family: 'Montserrat', sans-serif;
+    }
+
+    /* Layout under nav */
+    .content {
+      position: fixed; top: 7vw; left: 0; right: 0; bottom: 0;
+      display: flex; gap: 20px; align-items: stretch;
+      padding: 0 16px 16px 16px;
+      box-sizing: border-box;
+    }
+
+    /* Game area */
+    .game-wrap {
+      flex: 1 1 auto;
+      display: flex; align-items: stretch; justify-content: center;
+      min-width: 0;
+      position: relative;
+      background: #000;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    #unityContainer { width: 100%; height: 100%; }
+
+    /* Loading text */
+    #loading-text {
+      position: absolute; top: 16px; left: 0; right: 0;
+      text-align: center; color: white;
+      font-size: clamp(18px, 3vw, 32px); font-family: cursive;
+      z-index: 2; pointer-events: none;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    }
+
+    /* Right ad rail */
+    .side-ad {
+      flex: 0 0 300px;
+      display: block; text-align: center;
+      border-radius: 8px; overflow: hidden;
+      backdrop-filter: blur(6px) saturate(140%) brightness(85%);
+    }
+    .side-ad ins.adsbygoogle {
+      display: inline-block !important;
+      width: 300px !important; height: 600px !important;
+    }
+
+    @media (max-width: 1100px) {
+      .side-ad { display: none; }
+      .content { padding-right: 16px; }
+    }
+  </style>
+
+  <!-- Kill any <base> tag that might be injected -->
+  <script>
+    (function killBase() {
+      const nuke = () => { const b = document.querySelector('base'); if (b) b.remove(); };
+      nuke();
+      new MutationObserver(nuke).observe(document.head, { childList: true });
+    })();
+  </script>
+
+  <!-- Bendy / BATIM build (absolute URLs) -->
+  <script src="https://cdn.jsdelivr.net/gh/genizy/web-port@main/bendy/TemplateData/UnityProgress.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/genizy/web-port@main/bendy/Build/UnityLoader.js?1"></script>
+  <script>
+    // Merge multipart data file
+    function mergeFiles(fileParts) {
+      return new Promise((resolve, reject) => {
+        const buffers = [];
+        const step = i => {
+          if (i >= fileParts.length) { resolve(URL.createObjectURL(new Blob(buffers))); return; }
+          fetch(fileParts[i]).then(r=>r.arrayBuffer()).then(buf=>{ buffers.push(buf); step(i+1); }).catch(reject);
+        };
+        step(0);
+      });
+    }
+    function getParts(file, start, end) {
+      const parts = [];
+      for (let i=start; i<=end; i++) parts.push(file + '.part' + i);
+      return parts;
+    }
+    function resizeUnityContainer() {
+      const el = document.getElementById('unityContainer');
+      el.style.width = innerWidth + 'px';
+      el.style.height = innerHeight + 'px';
+    }
+
+    // Start Bendy
+    Promise.all([
+      mergeFiles(getParts('https://cdn.jsdelivr.net/gh/genizy/web-port@main/bendy/Build/BATIM.data.unityweb', 1, 7))
+    ]).then(([dataUrl]) => {
+      const json = {
+        companyName: "DefaultCompany",
+        productName: "OldCh2RippedTwo",
+        productVersion: "1.0",
+        dataUrl: dataUrl, /* merged data */
+        wasmCodeUrl: "https://cdn.jsdelivr.net/gh/genizy/web-port@main/bendy/Build/BATIM.wasm.code.unityweb",
+        wasmFrameworkUrl: "https://cdn.jsdelivr.net/gh/genizy/web-port@main/bendy/Build/BATIM.wasm.framework.unityweb",
+        graphicsAPI: ["WebGL 2.0","WebGL 1.0"],
+        webglContextAttributes: { preserveDrawingBuffer: false },
+        splashScreenStyle: "Dark",
+        backgroundColor: "#231F20",
+        developmentBuild: false,
+        multithreading: false,
+        unityVersion: "2019.4.17f1"
+      };
+      const blobUrl = URL.createObjectURL(new Blob([JSON.stringify(json)], {type:'application/json'}));
+      addEventListener('resize', resizeUnityContainer);
+      UnityLoader.instantiate('unityContainer', json, {
+        onProgress: UnityProgress,
+        url: blobUrl,
+        Module: {
+          onRuntimeInitialized: () => {
+            resizeUnityContainer();
+            const lt = document.getElementById('loading-text'); if (lt) lt.remove();
+          }
+        }
+      });
+    });
+  </script>
+</head>
+
+<body>
+  <nav>
+    <!-- Force local assets to your origin so <base> can’t hijack them -->
+    <a class="site-home" href="#"><img class="site-logo" alt="logo" src="#"></a>
+    <h3>www.NebulaPlay.Site</h3>
+  </nav>
+
+  <div class="content">
+    <!-- Game -->
+    <div class="game-wrap" id="game-wrap">
+      <div id="loading-text">LOADING...</div>
+      <div id="unityContainer"></div>
+    </div>
+
+    <!-- Right Vertical Ad -->
+    <aside class="side-ad">
+      <ins class="adsbygoogle"
+           style="display:inline-block;width:300px;height:600px"
+           data-ad-client="ca-pub-2366308143645027"
+           data-ad-slot="9891545305"></ins>
+      <script>(window.adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </aside>
+  </div>
+
+  <script>
+    // Pin your own logo, home link, and background to this origin
+    (function pinLocalAssets(){
+      const ORIGIN = location.origin;
+      const home = document.querySelector('.site-home');
+      const logo = document.querySelector('.site-logo');
+      if (home) home.href = ORIGIN + '/';
+      if (logo) logo.src = ORIGIN + '/images/logo.png';
+      document.body.style.background = `black url(${ORIGIN}/images/colour-dark-grey-mz-vf.jpg) center center / cover no-repeat fixed`;
+    })();
+
+    // Prevent right-click
+    document.addEventListener('contextmenu', e => e.preventDefault());
+
+    // Mouse lock on click
+    const wrap = document.getElementById('game-wrap');
+    wrap.addEventListener('click', () => {
+      const req = wrap.requestPointerLock || wrap.mozRequestPointerLock || wrap.webkitRequestPointerLock;
+      if (req) req.call(wrap);
+    });
+  </script>
+</body>
+</html>

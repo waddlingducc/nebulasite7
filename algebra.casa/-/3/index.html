@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NebulaPlay</title>
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap" rel="stylesheet">
+
+  <!-- Google Ads (load ONCE per page) -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2366308143645027" crossorigin="anonymous"></script>
+
+  <style>
+    html, body {
+      margin: 0; padding: 0; height: 100%;
+      overflow: hidden;
+      background: black url(/images/colour-dark-grey-mz-vf.jpg) center center / cover no-repeat fixed;
+    }
+
+    /* Nav bar */
+    nav {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 7vw;
+      display: flex; align-items: center;
+      backdrop-filter: blur(10px) saturate(200%) brightness(70%);
+      padding: 0 1%;
+      z-index: 10;
+    }
+    nav img {
+      width: 95px; height: auto;
+      margin-right: 1%;
+      border-radius: 1vw;
+    }
+    nav h3 {
+      font-size: 4vw; font-weight: 800; color: white;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    /* Row under nav (reserve 300px for the floating ad) */
+    .content {
+      position: fixed;
+      top: 7vw; left: 0; right: 0; bottom: 0;
+      display: flex; gap: 20px; align-items: stretch;
+      padding: 0 16px 16px 16px;
+      box-sizing: border-box;
+      margin-right: 300px; /* <-- space for the 300x600 ad */
+    }
+
+    /* Game area */
+    .game-wrap {
+      flex: 1 1 auto;
+      display: flex; align-items: stretch; justify-content: center;
+      min-width: 0;
+      position: relative;
+      background: #000;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    #game_frame { width: 100%; height: 100%; }
+
+    /* Floating right ad — hovers above nav */
+    .side-ad {
+      position: fixed;
+      top: 0;          /* set to 0 if you want it perfectly flush to the very top */
+      right: 0;
+      width: 300px;
+      height: 600px;
+      z-index: 9999;      /* above nav & game */
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 8px; overflow: hidden;
+      backdrop-filter: blur(6px) saturate(140%) brightness(85%);
+    }
+    .side-ad ins.adsbygoogle {
+      display: inline-block !important;
+      width: 300px !important;
+      height: 600px !important;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="/algebra.casa/"><img alt="logo" src="/images/logo.png"/></a>
+    <h3>www.Algebra.Casa</h3>
+  </nav>
+
+  <div class="content">
+    <!-- Game (UNCHANGED embed structure) -->
+    <div class="game-wrap">
+      <div id="game_frame"></div>
+    </div>
+  </div>
+
+  <!-- Floating Right Vertical Ad (moved out of .content) -->
+  <aside class="side-ad" style="top: 0;">
+    <ins class="adsbygoogle"
+         style="display:inline-block;width:300px;height:600px"
+         data-ad-client="ca-pub-2366308143645027"
+         data-ad-slot="9891545305"></ins>
+    <script>(window.adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </aside>
+
+  <!-- Eaglercraft Loader config (UNCHANGED) -->
+  <script>
+    window.disableUserscripts = true;
+    window.__eaglercraftLoaderClient = {
+      container: "game_frame",
+      name: "Eaglercraft 1.12",
+      file: "net.peytonplayz585.eaglercraft.v1_12.client",
+      cid: "bafybeidrnchyech7b26rqhm3tayt7p6mxvl23lzd4f5mcyqda7hbrzyal4",
+      path: "",
+      download: "https://cdn.jsdelivr.net/gh/genizy/mc@main/data/1.12.2.gz",
+      dlSize: 15601341,
+      gzip: true
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/gh/genizy/mc@main/shared/loader.js"></script>
+
+  <!-- Pointer lock (kept) -->
+  <script>
+  (function () {
+    const gameFrame = document.getElementById("game_frame");
+
+    const movementKeys = new Set(["KeyW","KeyA","KeyS","KeyD","Space","ShiftLeft","ShiftRight"]);
+    let lastMoveKeyAt = 0;
+    const MOVE_KEY_WINDOW_MS = 1200;
+
+    window.addEventListener("keydown", (e) => {
+      if (movementKeys.has(e.code)) lastMoveKeyAt = performance.now();
+    }, { capture: true });
+
+    function requestLock(canvas) {
+      const lock = canvas.requestPointerLock ||
+                   canvas.mozRequestPointerLock ||
+                   canvas.webkitRequestPointerLock;
+      if (lock) lock.call(canvas);
+    }
+
+    function shouldLock(event) {
+      if (event.button === 1 || event.button === 2) return true;
+      if (event.button === 0) {
+        return (performance.now() - lastMoveKeyAt) <= MOVE_KEY_WINDOW_MS;
+      }
+      return false;
+    }
+
+    function attach() {
+      const canvas = gameFrame.querySelector("canvas");
+      if (!canvas) return false;
+
+      const onPointerDown = (e) => {
+        if (!shouldLock(e)) return;
+        requestLock(canvas);
+      };
+
+      canvas.addEventListener("pointerdown", onPointerDown, { capture: true });
+      gameFrame.addEventListener("pointerdown", onPointerDown, { capture: true });
+      canvas.addEventListener("contextmenu", (e) => e.preventDefault());
+
+      return true;
+    }
+
+    if (!attach()) {
+      const mo = new MutationObserver(() => { if (attach()) mo.disconnect(); });
+      mo.observe(gameFrame, { childList: true, subtree: true });
+    }
+  })();
+  </script>
+
+  <script>
+    document.addEventListener("contextmenu", function(e) { e.preventDefault(); });
+  </script>
+
+</body>
+</html>

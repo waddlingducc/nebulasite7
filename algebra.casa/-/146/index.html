@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NebulaPlay</title>
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap" rel="stylesheet">
+
+  <!-- Google Ads (load ONCE per page) -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2366308143645027" crossorigin="anonymous"></script>
+
+  <style>
+    html, body {
+      margin: 0; padding: 0;
+      height: 100%; overflow: hidden;
+      /* fallback; we set the real background via JS to an absolute URL */
+      background: #000;
+    }
+
+    /* Nav bar */
+    nav {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 7vw;
+      display: flex; align-items: center;
+      backdrop-filter: blur(10px) saturate(200%) brightness(70%);
+      padding: 0 1%;
+      z-index: 10;
+    }
+    nav img { width: 95px; margin-right: 1%; border-radius: 1vw; }
+    nav h3 {
+      font-size: 4vw; font-weight: 800;
+      color: white; font-family: 'Montserrat', sans-serif;
+      margin: 0;
+    }
+
+    /* Layout under nav — reserve space for floating ad */
+    .content {
+      position: fixed; top: 7vw; left: 0; right: 0; bottom: 0;
+      display: flex; gap: 20px; align-items: stretch;
+      padding: 0 16px 16px 16px;
+      box-sizing: border-box;
+      margin-right: 300px; /* <-- keep a 300px lane for the ad */
+    }
+
+    /* Game area */
+    .game-wrap {
+      flex: 1 1 auto;
+      display: flex; align-items: stretch; justify-content: center;
+      min-width: 0;
+      position: relative;
+      background: #000;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    #unityContainer { width: 100%; height: 100%; }
+
+    /* Loading text */
+    #loading-text {
+      position: absolute; top: 16px; left: 0; right: 0;
+      text-align: center;
+      color: white;
+      font-size: clamp(18px, 3vw, 32px);
+      font-family: cursive;
+      z-index: 2;
+      pointer-events: none;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    }
+
+    /* Floating right ad — out of .content and above nav */
+    .side-ad {
+      position: fixed;
+      top: 0;            /* set to 0 for perfectly flush top */
+      right: 0;
+      width: 300px;
+      height: 600px;
+      z-index: 9999;        /* above nav & game */
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 8px; overflow: hidden;
+      backdrop-filter: blur(6px) saturate(140%) brightness(85%);
+    }
+    .side-ad ins.adsbygoogle {
+      display: inline-block !important;
+      width: 300px !important;
+      height: 600px !important;
+    }
+  </style>
+
+  <!-- Kill any <base> tag immediately & keep it gone -->
+  <script>
+    (function killBase() {
+      const removeBase = () => {
+        const b = document.querySelector('base');
+        if (b) b.remove();
+      };
+      removeBase();
+      new MutationObserver(removeBase).observe(document.head, { childList: true });
+    })();
+  </script>
+
+  <!-- Slender game scripts (absolute URLs) -->
+  <script src="https://cdn.jsdelivr.net/gh/genizy/web-port@main/slender/TemplateData/UnityProgress.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/genizy/web-port@main/slender/Build/UnityLoader.js"></script>
+  <script>
+    function mergeFiles(fileParts) {
+      return new Promise((resolve, reject) => {
+        const buffers = [];
+        const next = (i) => {
+          if (i >= fileParts.length) {
+            resolve(URL.createObjectURL(new Blob(buffers)));
+            return;
+          }
+          fetch(fileParts[i]).then(r => r.arrayBuffer()).then(buf => {
+            buffers.push(buf); next(i+1);
+          }).catch(reject);
+        };
+        next(0);
+      });
+    }
+    function getParts(file, start, end) {
+      const parts = [];
+      for (let i = start; i <= end; i++) parts.push(file + ".part" + i);
+      return parts;
+    }
+    function resizeUnityContainer() {
+      const el = document.getElementById("unityContainer");
+      el.style.width = window.innerWidth + "px";
+      el.style.height = window.innerHeight + "px";
+    }
+    Promise.all([
+      mergeFiles(getParts("https://cdn.jsdelivr.net/gh/genizy/web-port@main/slender/Build/Build.data.unityweb", 1, 2))
+    ]).then(([dataUrl]) => {
+      const json = {
+        companyName: "Parsec Productions",
+        productName: "Slender",
+        dataUrl: dataUrl,
+        asmCodeUrl: "https://cdn.jsdelivr.net/gh/genizy/web-port@main/slender/Build/Build.asm.code.unityweb",
+        asmMemoryUrl: "https://cdn.jsdelivr.net/gh/genizy/web-port@main/slender/Build/Build.asm.memory.unityweb",
+        asmFrameworkUrl: "https://cdn.jsdelivr.net/gh/genizy/web-port@main/slender/Build/Build.asm.framework.unityweb",
+        TOTAL_MEMORY: 268435456,
+        graphicsAPI: ["WebGL 2.0", "WebGL 1.0"],
+        webglContextAttributes: { preserveDrawingBuffer: false },
+        splashScreenStyle: "Dark",
+        backgroundColor: "#000000"
+      };
+      const blobUrl = URL.createObjectURL(new Blob([JSON.stringify(json)], { type: "application/json" }));
+      window.addEventListener('resize', resizeUnityContainer);
+      UnityLoader.instantiate("unityContainer", json, {
+        onProgress: UnityProgress,
+        url: blobUrl,
+        Module: {
+          onRuntimeInitialized: () => {
+            resizeUnityContainer();
+            const lt = document.getElementById("loading-text");
+            if (lt) lt.remove();
+          }
+        }
+      });
+    });
+  </script>
+</head>
+
+<body>
+  <nav>
+    <!-- These are set to your current origin at runtime to ignore any <base> -->
+    <a class="site-home" href="#">
+      <img class="site-logo" alt="logo" src="#">
+    </a>
+    <h3>www.Algebra.Casa</h3>
+  </nav>
+
+  <div class="content">
+    <!-- Game (UNCHANGED) -->
+    <div class="game-wrap" id="game-wrap">
+      <div id="loading-text">LOADING...</div>
+      <div id="unityContainer"></div>
+    </div>
+  </div>
+
+  <!-- Floating Right Vertical Ad (moved out of .content) -->
+  <aside class="side-ad" style="top: 0;">
+    <ins class="adsbygoogle"
+         style="display:inline-block;width:300px;height:600px"
+         data-ad-client="ca-pub-2366308143645027"
+         data-ad-slot="9891545305"></ins>
+    <script>(window.adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </aside>
+
+  <script>
+    // Force your own domain for logo, home link, and background (works with or without "www")
+    (function pinLocalAssets() {
+      const ORIGIN = location.origin; // e.g., https://nebulaplay.site or https://www.nebulaplay.site
+      const home = document.querySelector('.site-home');
+      const logo = document.querySelector('.site-logo');
+
+      if (home) home.href = ORIGIN + '/';
+      if (logo) logo.src = ORIGIN + '/images/logo.png';
+
+      // Background image as absolute URL
+      document.body.style.background = `black url(${ORIGIN}/images/colour-dark-grey-mz-vf.jpg) center center / cover no-repeat fixed`;
+    })();
+
+    // Prevent right-click
+    document.addEventListener("contextmenu", e => e.preventDefault());
+
+    // Mouse lock on click (kept)
+    const gameWrap = document.getElementById("game-wrap");
+    gameWrap.addEventListener("click", () => {
+      const req = gameWrap.requestPointerLock ||
+                  gameWrap.mozRequestPointerLock ||
+                  gameWrap.webkitRequestPointerLock;
+      if (req) req.call(gameWrap);
+    });
+  </script>
+</body>
+</html>
