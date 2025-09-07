@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>NebulaPlay</title>
 
+  <!-- Font -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap" rel="stylesheet">
+
+  <!-- Google Ads -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2366308143645027" crossorigin="anonymous"></script>
 
   <style>
@@ -14,57 +17,85 @@
       overflow: hidden;
       background: black url(/images/colour-dark-grey-mz-vf.jpg) center center / cover no-repeat fixed;
     }
+
     nav {
-      position: fixed; top: 0; left: 0; width: 100%;
-      height: 7vw; min-height: 60px; display: flex; align-items: center;
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 7vw; min-height: 60px;
+      display: flex; align-items: center;
       backdrop-filter: blur(10px) saturate(200%) brightness(70%);
       padding: 0 1%; z-index: 10;
     }
     nav img { width: 95px; height: auto; margin-right: 1%; border-radius: 1vw; }
-    nav h3 { font-size: 4vw; font-weight: 800; color: #fff; font-family: 'Montserrat', sans-serif; }
+    nav h3 { font-size: 4vw; font-weight: 800; color: white; font-family: 'Montserrat', sans-serif; }
 
     .content {
       position: fixed; top: 7vw; left: 0; right: 0; bottom: 0;
-      display: flex; gap: 20px; align-items: stretch; padding: 0 16px 16px;
-      box-sizing: border-box;
+      display: flex; align-items: stretch; justify-content: center;
+      padding: 0 16px 16px 16px; box-sizing: border-box;
+      margin-right: 300px; /* reserve lane so game never runs under ad */
     }
-    .game-wrap { flex: 1 1 auto; min-width: 0; position: relative; background:#000; border-radius: 8px; overflow: hidden; }
-    #game-frame { position:absolute; inset:0; width:100%; height:100%; border:0; display:block; }
-    .side-ad { flex: 0 0 300px; text-align: center; border-radius: 8px; overflow: hidden; backdrop-filter: blur(6px) saturate(140%) brightness(85%); }
-    .side-ad ins.adsbygoogle { display:inline-block !important; width:300px !important; height:600px !important; }
-    @media (max-width:1100px){ .side-ad{display:none;} .content{padding-right:16px;} }
+
+    .game-wrap {
+      flex: 1 1 auto;
+      display: flex; align-items: center; justify-content: center;
+      min-width: 0; position: relative;
+      background:#000; border-radius: 8px; overflow: hidden;
+    }
+
+    #game-frame {
+      width: 100%; height: 100%; border: none;
+      border-radius: 8px; background: #000;
+    }
+
+    /* Floating right ad (hovers over nav) */
+    .side-ad {
+      position: fixed; top: 10px; right: 0;
+      width: 300px; height: 600px;
+      z-index: 9999;
+      display: flex; justify-content: center; align-items: center;
+      border-radius: 8px; overflow: hidden;
+      backdrop-filter: blur(6px) saturate(140%) brightness(85%);
+    }
+    .side-ad ins.adsbygoogle {
+      display:inline-block !important;
+      width:300px !important; height:600px !important;
+    }
   </style>
 </head>
 <body>
 
+  <!-- Nav -->
   <nav>
     <a href="/"><img alt="logo" src="/images/logo.png"></a>
     <h3>www.NebulaPlay.Site</h3>
   </nav>
 
+  <!-- Content -->
   <div class="content">
     <div class="game-wrap">
+      <!-- Same-origin iframe, we’ll inject the Baldi loader with <base> -->
       <iframe id="game-frame" allow="fullscreen; autoplay; gamepad; pointer-lock" allowfullscreen></iframe>
     </div>
-
-    <aside class="side-ad">
-      <ins class="adsbygoogle"
-           style="display:inline-block;width:300px;height:600px"
-           data-ad-client="ca-pub-2366308143645027"
-           data-ad-slot="9891545305"></ins>
-      <script>(window.adsbygoogle=window.adsbygoogle||[]).push({});</script>
-    </aside>
   </div>
 
+  <!-- Floating Ad -->
+  <aside class="side-ad">
+    <ins class="adsbygoogle"
+         style="display:inline-block;width:300px;height:600px"
+         data-ad-client="ca-pub-2366308143645027"
+         data-ad-slot="9891545305"></ins>
+    <script>(adsbygoogle=window.adsbygoogle||[]).push({});</script>
+  </aside>
+
   <script>
-    // Build the inner document that contains <base href> only for the game.
+    // Build the inner document with its own <base> for Unity game
     const BALDI_BASE = 'https://cdn.jsdelivr.net/gh/genizy/web-port@main/baldi-remaster/';
-    const doc = `
+    const inner = `
 <!DOCTYPE html><html lang="en-us"><head>
   <base href="${BALDI_BASE}">
-  <meta charset="utf-8"><meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta charset="utf-8">
   <style>
-    html,body{margin:0;padding:0;border:0;height:100%;width:100%;overflow:hidden;background:#231F20;}
+    html,body{margin:0;height:100%;overflow:hidden;background:#231F20;}
     #unity-canvas{width:100%;height:100%;display:block;image-rendering:pixelated;image-rendering:-moz-crisp-edges;}
     #loading-text{position:absolute;top:16px;left:0;right:0;text-align:center;color:#fff;font-family:cursive;font-size:28px;text-shadow:0 2px 8px rgba(0,0,0,.6);}
   </style>
@@ -73,11 +104,6 @@
   <canvas id="unity-canvas" tabindex="-1"></canvas>
   <script src="Build/WebGL.loader.js"><\/script>
   <script>
-    if(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)){
-      var m=document.createElement('meta'); m.name='viewport';
-      m.content='width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
-      document.head.appendChild(m);
-    }
     const loadingText=document.getElementById('loading-text');
     let totalBytes=0,loadedBytes=0;
     function fmt(b){if(b>1073741824)return(b/1073741824).toFixed(2)+' GB';if(b>1048576)return(b/1048576).toFixed(2)+' MB';if(b>1024)return(b/1024).toFixed(2)+' KB';return b+' B';}
@@ -91,17 +117,13 @@
     }
     async function merge(parts,mime){const bufs=await Promise.all(parts.map(fetchWithProgress));return URL.createObjectURL(new Blob(bufs,{type:mime}));}
     function parts(root,n){return Array.from({length:n},(_,i)=>root+'.part'+(i+1));}
-
     (async()=>{
-      const dataParts=parts('Build/WebGL.data',3);
-      const wasmParts=parts('Build/WebGL.wasm',3);
+      const dataParts=parts('Build/WebGL.data',3), wasmParts=parts('Build/WebGL.wasm',3);
       totalBytes=(await Promise.all([...dataParts,...wasmParts].map(headSize))).reduce((a,b)=>a+b,0);
-
       const [dataUrl,wasmUrl]=await Promise.all([
         merge(dataParts,'application/octet-stream'),
         merge(wasmParts,'application/wasm')
       ]);
-
       const canvas=document.getElementById('unity-canvas');
       createUnityInstance(canvas,{
         dataUrl, frameworkUrl:'Build/WebGL.framework.js', codeUrl:wasmUrl,
@@ -109,26 +131,22 @@
         companyName:'Basically Games', productName:"Baldi\\'s Basics Classic Remastered", productVersion:'1.1',
         devicePixelRatio:1, matchWebGLToCanvasSize:true,
         webglContextAttributes:{antialias:false,alpha:false,preserveDrawingBuffer:false,powerPreference:'high-performance'}
-      }).then(()=>{ if(loadingText) loadingText.remove(); });
-
-      // Pointer lock inside iframe
+      }).then(()=>{if(loadingText)loadingText.remove();});
+      // pointer lock
       const move=new Set(['KeyW','KeyA','KeyS','KeyD','Space','ShiftLeft','ShiftRight']);
       let last=0,WIN=1200;
       addEventListener('keydown',e=>{if(move.has(e.code))last=performance.now();},{capture:true});
       function lock(el){(el.requestPointerLock||el.webkitRequestPointerLock||el.mozRequestPointerLock)?.call(el);}
-      function ok(e){if(e.button===1||e.button===2)return true; if(e.button===0)return performance.now()-last<=WIN; return false;}
+      function ok(e){if(e.button===1||e.button===2)return true;if(e.button===0)return performance.now()-last<=WIN;return false;}
       canvas.addEventListener('pointerdown',e=>{if(ok(e))lock(canvas);},{capture:true});
       canvas.addEventListener('contextmenu',e=>e.preventDefault());
     })();
   <\/script>
 </body></html>`;
 
-    // Write inner doc into the iframe (same-origin)
     const frame = document.getElementById('game-frame');
-    const idoc = frame.contentDocument || frame.contentWindow.document;
-    idoc.open(); idoc.write(doc); idoc.close();
-
-    // Ensure the iframe gets focus on click so pointer-lock can trigger
+    const doc = frame.contentDocument || frame.contentWindow.document;
+    doc.open(); doc.write(inner); doc.close();
     frame.addEventListener('pointerdown', () => frame.focus(), {capture:true});
   </script>
 
