@@ -52,54 +52,67 @@
         <h3>www.NebulaPlay.Site</h3>
     </nav>
 
-    <div class="featured">
-        <h1>Featured 🔥</h1>
-        <div class="column">
-          <a href="_/1/">
-            <img src="/images/th.jpg">
-            <div class="play-button">
-                <i class="fa-solid fa-play"></i>
-            </div>
-          </a>
-          <a href="_/2/">
-            <img src="/images/sadsf.jpg">
-            <div class="play-button">
-                <i class="fa-solid fa-play"></i>
-            </div>
-          </a>
+        <div class="featured">
+      <h1>Featured 🔥</h1>
+
+      <div class="column">
+        <div class="game" data-href="_/1/" style="cursor:pointer;">
+          <img src="/images/th.jpg">
+          <div class="play-button"></div>
         </div>
-        <div class="row">
-          <a href="_/3">
-            <img src="/images/fsddsfd.png">
-            <div class="play-button">
-                <i class="fa-solid fa-play"></i>
-            </div>
-          </a>
+
+        <div class="game" data-href="_/2/" style="cursor:pointer;">
+          <img src="/images/sadsf.jpg">
+          <div class="play-button">
+            <i class="fa-solid fa-play"></i>
+          </div>
         </div>
-        <div class="row">
-          <a href="_/4/">
-            <img src="/images/vsdvsd.jpg">
-            <div class="play-button">
-                <i class="fa-solid fa-play"></i>
-            </div>
-            </a>
+      </div>
+
+      <div class="row">
+        <div class="game" data-href="_/3" style="cursor:pointer;">
+          <img src="/images/fsddsfd.png">
+          <div class="play-button">
+            <i class="fa-solid fa-play"></i>
+          </div>
         </div>
-        <div class="column">
-          <a href="_/5/">
-            <img src="/images/e88a7c27-339a-4711-8238-2083008bd082.avif">
-            <div class="play-button">
-                <i class="fa-solid fa-play"></i>
-            </div>
-          </a>
-          <a href="_/6/">
-            <img src="/images/swRMqEkK_400x400.jpg">
-            <div class="play-button">
-                <i class="fa-solid fa-play"></i>
-            </div>
-          </a>
+      </div>
+
+      <div class="row">
+        <div class="game" data-href="_/4/" style="cursor:pointer;">
+          <img src="/images/vsdvsd.jpg">
+          <div class="play-button">
+            <i class="fa-solid fa-play"></i>
+          </div>
         </div>
+      </div>
+
+      <div class="column">
+        <div class="game" data-href="_/5/" style="cursor:pointer;">
+          <img src="/images/e88a7c27-339a-4711-8238-2083008bd082.avif">
+          <div class="play-button">
+            <i class="fa-solid fa-play"></i>
+          </div>
         </div>
-    </div>
+
+        <div class="game" data-href="_/6/" style="cursor:pointer;">
+          <img src="/images/swRMqEkK_400x400.jpg">
+          <div class="play-button">
+            <i class="fa-solid fa-play"></i>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        // Intercept clicks so Ctrl+Click / Cmd+Click won't open in new tab
+        document.querySelectorAll('.game').forEach(div => {
+          div.addEventListener('click', e => {
+            e.preventDefault();
+            window.location.href = div.dataset.href; // force same tab
+          });
+        });
+      </script>
+      </div>
 
 
 
