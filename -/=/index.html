@@ -1,55 +1,49 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>NebulaPlay</title>
-
-  <!-- Montserrat -->
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap" rel="stylesheet">
-
-  <!-- AdSense -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2366308143645027"
-     crossorigin="anonymous"></script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NebulaPlay</title>
+<!-- Montserrat -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&amp;display=swap" rel="stylesheet"/>
+<!-- AdSense -->
+<script async="" crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2366308143645027"></script>
 </head>
-<body style="margin:0;padding:0;height:100%;overflow:hidden;background:black url(/images/colour-dark-grey-mz-vf.jpg) center center / cover no-repeat fixed;font-family:'Montserrat',sans-serif;">
-
-  <!-- Top bar -->
-  <nav style="position:fixed;top:0;left:0;width:100%;height:7vw;display:flex;align-items:center;backdrop-filter:blur(10px) saturate(200%) brightness(70%);padding:0 1%;z-index:10;">
-    <a href="/"><img alt="logo" src="/images/logo.png" style="width:95px;height:auto;margin-right:1%;border-radius:1vw;"/></a>
-    <h3 style="font-size:4vw;font-weight:800;color:white;margin:0;">www.NebulaPlay.Site</h3>
-  </nav>
-
-  <!-- Game container under nav -->
-  <div style="position:fixed;top:7vw;left:0;right:0;bottom:0;display:flex;align-items:stretch;justify-content:center;padding:0 16px 16px 16px;box-sizing:border-box;margin-right:300px;">
-    <div style="flex:1 1 auto;display:flex;align-items:center;justify-content:center;min-width:0;background:url(/images/ubackground.png) center/cover no-repeat;border-radius:8px;overflow:hidden;">
-      <iframe 
-        src="https://ub.erezerwacja24.pl/" 
-        sandbox="allow-scripts allow-same-origin" 
-        allowtransparency="true"
-        style="width:100%;height:100%;border:none;border-radius:8px;background:transparent;">
-        <p>Your browser does not support iframes.</p>
-      </iframe>
-    </div>
-  </div>
-
-  <!-- Floating Right Vertical Ad -->
-  <aside style="position:fixed;top:0px;right:0;width:300px;height:600px;z-index:9999;display:flex;justify-content:center;align-items:center;border-radius:8px;overflow:hidden;backdrop-filter:blur(6px) saturate(140%) brightness(85%);">
-    <ins class="adsbygoogle"
-         style="display:inline-block;width:300px;height:600px"
-         data-ad-client="ca-pub-2366308143645027"
-         data-ad-slot="9891545305"></ins>
-    <script>
+<body style="margin:0;padding:0;height:100%;overflow:hidden;background:black url(/images/colour-dark-grey-mz-vf.jpg) center center / cover no-repeat fixed;font-family:'Montserrat',sans-serif;"><div id="hover-ad-300x600" style="position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:2147483647;"><ins class="adsbygoogle" data-ad-client="ca-pub-2366308143645027" data-ad-slot="9891545305" style="display:inline-block;width:300px;height:600px"></ins><script>
       (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
-  </aside>
-
-  <script>
+    </script></div>
+<!-- Top bar -->
+<nav>
+<a class="logo-link" data-href="/" style="cursor:pointer;">
+<img alt="logo" src="/images/logo.png"/>
+</a>
+<script>
+        document.querySelectorAll('.logo-link').forEach(link => {
+          link.addEventListener('click', e => {
+            e.preventDefault(); // stops new tab or default <a> behavior
+            window.location.href = link.dataset.href; // always same tab
+          });
+        });
+      </script>
+<h3>www.NebulaPlay.Site</h3>
+</nav>
+<!-- Game container under nav -->
+<div style="position:fixed;top:7vw;left:0;right:0;bottom:0;display:flex;align-items:stretch;justify-content:center;padding:0 16px 16px 16px;box-sizing:border-box;margin-right:300px;">
+<div style="flex:1 1 auto;display:flex;align-items:center;justify-content:center;min-width:0;background:url(/images/ubackground.png) center/cover no-repeat;border-radius:8px;overflow:hidden;">
+<iframe allowtransparency="true" sandbox="allow-scripts allow-same-origin" src="https://ub.erezerwacja24.pl/s/" style="width:100%;height:100%;border:none;border-radius:8px;background:transparent;">
+<p>Your browser does not support iframes.</p>
+</iframe>
+</div>
+</div>
+<!-- Floating Right Vertical Ad -->
+<aside style="position:fixed;top:0px;right:0;width:300px;height:600px;z-index:9999;display:flex;justify-content:center;align-items:center;border-radius:8px;overflow:hidden;backdrop-filter:blur(6px) saturate(140%) brightness(85%);">
+</aside>
+<script>
     /* Disable right-click */
     document.addEventListener("contextmenu", function(e) {
       e.preventDefault();
     });
   </script>
-
 </body>
 </html>
