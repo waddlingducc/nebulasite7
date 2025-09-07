@@ -1,15 +1,17 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>NebulaPlay</title>
-<!-- Font -->
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&amp;display=swap" rel="stylesheet"/>
-<!-- Google Ads (load ONCE per page) -->
-<script async="" crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2366308143645027"></script>
-<style>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NebulaPlay</title>
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap" rel="stylesheet">
+
+  <!-- Google Ads (load ONCE per page) -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2366308143645027" crossorigin="anonymous"></script>
+
+  <style>
     html, body {
       margin: 0; padding: 0;
       height: 100%; overflow: hidden;
@@ -84,8 +86,9 @@
       height: 600px !important;
     }
   </style>
-<!-- Kill any <base> tag immediately & keep it gone -->
-<script>
+
+  <!-- Kill any <base> tag immediately & keep it gone -->
+  <script>
     (function killBase() {
       const removeBase = () => {
         const b = document.querySelector('base');
@@ -95,10 +98,11 @@
       new MutationObserver(removeBase).observe(document.head, { childList: true });
     })();
   </script>
-<!-- Slender game scripts (absolute URLs) -->
-<script src="https://cdn.jsdelivr.net/gh/genizy/web-port@main/slender/TemplateData/UnityProgress.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/genizy/web-port@main/slender/Build/UnityLoader.js"></script>
-<script>
+
+  <!-- Slender game scripts (absolute URLs) -->
+  <script src="https://cdn.jsdelivr.net/gh/genizy/web-port@main/slender/TemplateData/UnityProgress.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/genizy/web-port@main/slender/Build/UnityLoader.js"></script>
+  <script>
     function mergeFiles(fileParts) {
       return new Promise((resolve, reject) => {
         const buffers = [];
@@ -156,33 +160,34 @@
     });
   </script>
 </head>
-<body><div id="hover-ad-300x600" style="position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:2147483647;"><ins class="adsbygoogle" data-ad-client="ca-pub-2366308143645027" data-ad-slot="9891545305" style="display:inline-block;width:300px;height:600px"></ins><script>(window.adsbygoogle = window.adsbygoogle || []).push({});</script></div>
+
+<body>
   <nav>
-  <a class="logo-link" data-href="/" style="cursor:pointer;">
-  <img alt="logo" src="/images/logo.png"/>
-  </a>
-  <script>
-          document.querySelectorAll('.logo-link').forEach(link => {
-            link.addEventListener('click', e => {
-              e.preventDefault(); // stops new tab or default <a> behavior
-              window.location.href = link.dataset.href; // always same tab
-            });
-          });
-        </script>
-  <h3>www.NebulaPlay.Site</h3>
+    <!-- These are set to your current origin at runtime to ignore any <base> -->
+    <a class="site-home" href="#">
+      <img class="site-logo" alt="logo" src="#">
+    </a>
+    <h3>www.NebulaPlay.Site</h3>
   </nav>
-<!-- Game (UNCHANGED) -->
-<div class="game-wrap" id="game-wrap">
-<div id="loading-text">LOADING...</div>
-<div id="unityContainer"></div>
-</div>
-</div>
-<!-- Floating Right Vertical Ad (moved out of .content) -->
-<aside class="side-ad">
 
+  <div class="content">
+    <!-- Game (UNCHANGED) -->
+    <div class="game-wrap" id="game-wrap">
+      <div id="loading-text">LOADING...</div>
+      <div id="unityContainer"></div>
+    </div>
+  </div>
 
-</aside>
-<script>
+  <!-- Floating Right Vertical Ad (moved out of .content) -->
+  <aside class="side-ad">
+    <ins class="adsbygoogle"
+         style="display:inline-block;width:300px;height:600px"
+         data-ad-client="ca-pub-2366308143645027"
+         data-ad-slot="9891545305"></ins>
+    <script>(window.adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </aside>
+
+  <script>
     // Force your own domain for logo, home link, and background (works with or without "www")
     (function pinLocalAssets() {
       const ORIGIN = location.origin; // e.g., https://nebulaplay.site or https://www.nebulaplay.site
@@ -208,5 +213,47 @@
       if (req) req.call(gameWrap);
     });
   </script>
+    <!-- Put this right after your #games block (or before </body>) -->
+<script>
+(function () {
+  const links = document.querySelectorAll('#games a');
+
+  links.forEach(a => {
+    // 1) If it still uses onclick="window.location.href='...'"
+    const oc = a.getAttribute('onclick');
+    if (oc) {
+      const match = oc.match(/window\.location\.href\s*=\s*['"]([^'"]+)['"]/);
+      if (match && match[1]) {
+        a.dataset.href = match[1];   // stash the target URL
+      }
+      a.removeAttribute('onclick');   // clean inline handler
+    }
+
+    // 2) Accessibility (works like a real link)
+    if (!a.hasAttribute('tabindex')) a.setAttribute('tabindex', '0');
+    if (!a.hasAttribute('role')) a.setAttribute('role', 'link');
+
+    // 3) Intercept clicks to force same-tab nav
+    a.addEventListener('click', e => {
+      // Block middle-click or modifier keys (Cmd/Ctrl/Shift/Alt)
+      if (e.button === 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
+        e.preventDefault();
+      } else {
+        e.preventDefault();
+      }
+      if (a.dataset.href) window.location.assign(a.dataset.href);
+    });
+
+    // 4) Keyboard support (Enter / Space)
+    a.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        if (a.dataset.href) window.location.assign(a.dataset.href);
+      }
+    });
+  });
+})();
+</script>
+
 </body>
 </html>
