@@ -79,7 +79,7 @@
     /* Floating right ad */
     .side-ad {
   position: fixed;
-  top: 10px;
+  top: 0px;
   right: 0;
   width: 300px;
   height: 600px;
@@ -126,47 +126,6 @@
       e.preventDefault();
     });
   </script>
-<!-- Put this right after your #games block (or before </body>) -->
-<script>
-(function () {
-  const links = document.querySelectorAll('#games a');
-
-  links.forEach(a => {
-    // 1) If it still uses onclick="window.location.href='...'"
-    const oc = a.getAttribute('onclick');
-    if (oc) {
-      const match = oc.match(/window\.location\.href\s*=\s*['"]([^'"]+)['"]/);
-      if (match && match[1]) {
-        a.dataset.href = match[1];   // stash the target URL
-      }
-      a.removeAttribute('onclick');   // clean inline handler
-    }
-
-    // 2) Accessibility (works like a real link)
-    if (!a.hasAttribute('tabindex')) a.setAttribute('tabindex', '0');
-    if (!a.hasAttribute('role')) a.setAttribute('role', 'link');
-
-    // 3) Intercept clicks to force same-tab nav
-    a.addEventListener('click', e => {
-      // Block middle-click or modifier keys (Cmd/Ctrl/Shift/Alt)
-      if (e.button === 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
-        e.preventDefault();
-      } else {
-        e.preventDefault();
-      }
-      if (a.dataset.href) window.location.assign(a.dataset.href);
-    });
-
-    // 4) Keyboard support (Enter / Space)
-    a.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        if (a.dataset.href) window.location.assign(a.dataset.href);
-      }
-    });
-  });
-})();
-</script>
 
 </body>
 </html>
