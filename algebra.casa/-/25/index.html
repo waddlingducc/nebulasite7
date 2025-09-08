@@ -8,7 +8,7 @@
   <!-- Font -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap" rel="stylesheet">
 
-  <!-- Google Ads (load ONCE per page) -->
+  <!-- Google Ads -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2366308143645027" crossorigin="anonymous"></script>
 
   <style>
@@ -18,198 +18,148 @@
       background: black url(/images/colour-dark-grey-mz-vf.jpg) center center / cover no-repeat fixed;
     }
 
-    /* Nav bar */
     nav {
       position: fixed; top: 0; left: 0;
-      width: 100%; height: 7vw;
+      width: 100%; height: 7vw; min-height: 60px;
       display: flex; align-items: center;
       backdrop-filter: blur(10px) saturate(200%) brightness(70%);
-      padding: 0 1%;
-      z-index: 10;
+      padding: 0 1%; z-index: 10;
     }
-    nav img {
-      width: 95px; height: auto;
-      margin-right: 1%;
-      border-radius: 1vw;
-    }
-    nav h3 {
-      font-size: 4vw; font-weight: 800; color: white;
-      font-family: 'Montserrat', sans-serif;
-    }
+    nav img { width: 95px; height: auto; margin-right: 1%; border-radius: 1vw; }
+    nav h3 { font-size: 4vw; font-weight: 800; color: white; font-family: 'Montserrat', sans-serif; }
 
-    /* Layout under nav — reserve space for the floating ad */
     .content {
-      position: fixed;
-      top: 7vw; left: 0; right: 0; bottom: 0;
-      display: flex; gap: 20px; align-items: stretch;
-      padding: 0 16px 16px 16px;
-      box-sizing: border-box;
-      margin-right: 300px; /* <-- keep 300px lane for the ad */
+      position: fixed; top: 7vw; left: 0; right: 0; bottom: 0;
+      display: flex; align-items: stretch; justify-content: center;
+      padding: 0 16px 16px 16px; box-sizing: border-box;
+      margin-right: 300px; /* reserve lane so game never runs under ad */
     }
 
-    /* Game area */
     .game-wrap {
       flex: 1 1 auto;
-      display: flex; align-items: stretch; justify-content: center;
-      min-width: 0;
-      position: relative;
-      background: #000;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    #game_frame { width: 100%; height: 100%; position: relative; }
-    #unity-canvas { width: 100%; height: 100%; display: block; }
-
-    /* Loading text */
-    #baldi-loading {
-      position: absolute;
-      top: 16px; left: 0; right: 0;
-      text-align: center;
-      color: white;
-      font-size: clamp(18px, 3vw, 32px);
-      font-family: cursive;
-      z-index: 2;
-      pointer-events: none;
-      text-shadow: 0 2px 8px rgba(0,0,0,0.6);
-    }
-
-    /* Floating right ad — out of .content and above nav */
-    .side-ad {
-      position: fixed;
-      top: 0;        /* set to 0 for perfectly flush top */
-      right: 0;
-      width: 300px;
-      height: 600px;
-      z-index: 9999;    /* above nav & game */
       display: flex; align-items: center; justify-content: center;
+      min-width: 0; position: relative;
+      background:#000; border-radius: 8px; overflow: hidden;
+    }
+
+    #game-frame {
+      width: 100%; height: 100%; border: none;
+      border-radius: 8px; background: #000;
+    }
+
+    /* Floating right ad (hovers over nav) */
+    .side-ad {
+      position: fixed; top: 0px; right: 0;
+      width: 300px; height: 600px;
+      z-index: 9999;
+      display: flex; justify-content: center; align-items: center;
       border-radius: 8px; overflow: hidden;
       backdrop-filter: blur(6px) saturate(140%) brightness(85%);
     }
     .side-ad ins.adsbygoogle {
-      display: inline-block !important;
-      width: 300px !important;
-      height: 600px !important;
+      display:inline-block !important;
+      width:300px !important; height:600px !important;
     }
   </style>
 </head>
 <body>
 
+  <!-- Nav -->
   <nav>
-    <a href="/algebra.casa/"><img alt="logo" src="/images/logo.png"/></a>
-    <h3>www.Algebra.Casa</h3>
-  </nav>
+      <a class="logo-link" data-href="/" style="cursor:pointer;">
+        <img src="/images/logo.png" alt="logo">
+      </a>
 
+      <script>
+        document.querySelectorAll('.logo-link').forEach(link => {
+          link.addEventListener('click', e => {
+            e.preventDefault(); // stops new tab or default <a> behavior
+            window.location.href = link.dataset.href; // always same tab
+          });
+        });
+      </script>
+
+      <h3>www.NebulaPlay.Site</h3>
+    </nav>
+
+  <!-- Content -->
   <div class="content">
-    <!-- Game (UNCHANGED) -->
     <div class="game-wrap">
-      <div id="game_frame">
-        <div id="baldi-loading">LOADING...</div>
-        <canvas id="unity-canvas" tabindex="-1"></canvas>
-      </div>
+      <!-- Same-origin iframe, we’ll inject the Baldi loader with <base> -->
+      <iframe id="game-frame" allow="fullscreen; autoplay; gamepad; pointer-lock" allowfullscreen></iframe>
     </div>
   </div>
 
-  <!-- Floating Right Vertical Ad (moved out of .content) -->
-  <aside class="side-ad" style="top: 0;">
+  <!-- Floating Ad -->
+  <aside class="side-ad">
     <ins class="adsbygoogle"
          style="display:inline-block;width:300px;height:600px"
          data-ad-client="ca-pub-2366308143645027"
          data-ad-slot="9891545305"></ins>
-    <script>(window.adsbygoogle = window.adsbygoogle || []).push({});</script>
+    <script>(adsbygoogle=window.adsbygoogle||[]).push({});</script>
   </aside>
 
-  <!-- Baldi’s Basics WebGL loader (UNCHANGED) -->
   <script>
+    // Build the inner document with its own <base> for Unity game
     const BALDI_BASE = 'https://cdn.jsdelivr.net/gh/genizy/web-port@main/baldi-remaster/';
-
-    // Mobile meta from your embed
-    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-      var meta = document.createElement('meta');
-      meta.name = 'viewport';
-      meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
-      document.getElementsByTagName('head')[0].appendChild(meta);
-    }
-  </script>
-  <script src="https://cdn.jsdelivr.net/gh/genizy/web-port@main/baldi-remaster/Build/WebGL.loader.js"></script>
+    const inner = `
+<!DOCTYPE html><html lang="en-us"><head>
+  <base href="${BALDI_BASE}">
+  <meta charset="utf-8">
+  <style>
+    html,body{margin:0;height:100%;overflow:hidden;background:#231F20;}
+    #unity-canvas{width:100%;height:100%;display:block;image-rendering:pixelated;image-rendering:-moz-crisp-edges;}
+    #loading-text{position:absolute;top:16px;left:0;right:0;text-align:center;color:#fff;font-family:cursive;font-size:28px;text-shadow:0 2px 8px rgba(0,0,0,.6);}
+  </style>
+</head><body>
+  <div id="loading-text">LOADING...</div>
+  <canvas id="unity-canvas" tabindex="-1"></canvas>
+  <script src="Build/WebGL.loader.js"><\/script>
   <script>
-    const loadingText = document.getElementById("baldi-loading");
-    let totalBytes = 0;
-    let loadedBytes = 0;
-
-    function formatSize(bytes) {
-      if (bytes > 1024 * 1024 * 1024) return (bytes / (1024*1024*1024)).toFixed(2) + " GB";
-      if (bytes > 1024 * 1024)       return (bytes / (1024*1024)).toFixed(2) + " MB";
-      if (bytes > 1024)              return (bytes / 1024).toFixed(2) + " KB";
-      return bytes + " B";
-    }
-    async function getSize(url) {
-      try {
-        const res = await fetch(url, { method: "HEAD" });
-        return parseInt(res.headers.get("Content-Length") || "0", 10);
-      } catch { return 0; }
-    }
-    async function fetchWithProgress(url) {
-      const response = await fetch(url);
-      const reader = response.body.getReader();
-      let chunks = [];
-      let received = 0;
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        received += value.length;
-        loadedBytes += value.length;
-        chunks.push(value);
-        const doneText = formatSize(loadedBytes);
-        const totalText = formatSize(totalBytes);
-        const percent = totalBytes > 0 ? ((loadedBytes / totalBytes) * 100).toFixed(1) : "?";
-        if (loadingText) loadingText.textContent = `LOADING... ${doneText} / ${totalText} (${percent}%)`;
+    const loadingText=document.getElementById('loading-text');
+    let totalBytes=0,loadedBytes=0;
+    function fmt(b){if(b>1073741824)return(b/1073741824).toFixed(2)+' GB';if(b>1048576)return(b/1048576).toFixed(2)+' MB';if(b>1024)return(b/1024).toFixed(2)+' KB';return b+' B';}
+    async function headSize(u){try{const r=await fetch(u,{method:'HEAD'});return +(r.headers.get('Content-Length')||0);}catch{return 0;}}
+    async function fetchWithProgress(u){
+      const r=await fetch(u),rd=r.body.getReader();let rec=0,chunks=[];
+      while(true){const {done,value}=await rd.read();if(done)break;chunks.push(value);rec+=value.length;loadedBytes+=value.length;
+        if(loadingText&&totalBytes){loadingText.textContent='LOADING... '+fmt(loadedBytes)+' / '+fmt(totalBytes)+' ('+((loadedBytes/totalBytes*100).toFixed(1))+'%)';}
       }
-      let fullBuffer = new Uint8Array(received);
-      let offset = 0;
-      for (let chunk of chunks) {
-        fullBuffer.set(chunk, offset);
-        offset += chunk.length;
-      }
-      return fullBuffer.buffer;
+      const out=new Uint8Array(rec);let off=0;for(const c of chunks){out.set(c,off);off+=c.length;}return out.buffer;
     }
-    async function mergeFiles(parts) {
-      const buffers = await Promise.all(parts.map(fetchWithProgress));
-      return URL.createObjectURL(new Blob(buffers));
-    }
-    function getParts(file, count) {
-      const parts = [];
-      for (let i = 1; i <= count; i++) parts.push(file + ".part" + i);
-      return parts;
-    }
-
-    (async () => {
-      const dataParts = getParts(BALDI_BASE + "Build/WebGL.data", 3);
-      const wasmParts = getParts(BALDI_BASE + "Build/WebGL.wasm", 3);
-      const allParts = [...dataParts, ...wasmParts];
-      const sizes = await Promise.all(allParts.map(getSize));
-      totalBytes = sizes.reduce((a, b) => a + b, 0);
-
-      const [dataUrl, wasmUrl] = await Promise.all([
-        mergeFiles(dataParts),
-        mergeFiles(wasmParts)
+    async function merge(parts,mime){const bufs=await Promise.all(parts.map(fetchWithProgress));return URL.createObjectURL(new Blob(bufs,{type:mime}));}
+    function parts(root,n){return Array.from({length:n},(_,i)=>root+'.part'+(i+1));}
+    (async()=>{
+      const dataParts=parts('Build/WebGL.data',3), wasmParts=parts('Build/WebGL.wasm',3);
+      totalBytes=(await Promise.all([...dataParts,...wasmParts].map(headSize))).reduce((a,b)=>a+b,0);
+      const [dataUrl,wasmUrl]=await Promise.all([
+        merge(dataParts,'application/octet-stream'),
+        merge(wasmParts,'application/wasm')
       ]);
-
-      createUnityInstance(document.getElementById("unity-canvas"), {
-        dataUrl: dataUrl,
-        frameworkUrl: BALDI_BASE + "Build/WebGL.framework.js",
-        codeUrl: wasmUrl,
-        streamingAssetsUrl: BALDI_BASE + "StreamingAssets",
-        companyName: "Basically Games",
-        productName: "Baldi's Basics Classic Remastered",
-        productVersion: "1.1",
-      }).then(() => {
-        if (loadingText) loadingText.remove();
-      });
+      const canvas=document.getElementById('unity-canvas');
+      createUnityInstance(canvas,{
+        dataUrl, frameworkUrl:'Build/WebGL.framework.js', codeUrl:wasmUrl,
+        streamingAssetsUrl:'StreamingAssets',
+        companyName:'Basically Games', productName:"Baldi\\'s Basics Classic Remastered", productVersion:'1.1',
+        devicePixelRatio:1, matchWebGLToCanvasSize:true,
+        webglContextAttributes:{antialias:false,alpha:false,preserveDrawingBuffer:false,powerPreference:'high-performance'}
+      }).then(()=>{if(loadingText)loadingText.remove();});
+      // pointer lock
+      const move=new Set(['KeyW','KeyA','KeyS','KeyD','Space','ShiftLeft','ShiftRight']);
+      let last=0,WIN=1200;
+      addEventListener('keydown',e=>{if(move.has(e.code))last=performance.now();},{capture:true});
+      function lock(el){(el.requestPointerLock||el.webkitRequestPointerLock||el.mozRequestPointerLock)?.call(el);}
+      function ok(e){if(e.button===1||e.button===2)return true;if(e.button===0)return performance.now()-last<=WIN;return false;}
+      canvas.addEventListener('pointerdown',e=>{if(ok(e))lock(canvas);},{capture:true});
+      canvas.addEventListener('contextmenu',e=>e.preventDefault());
     })();
-  </script>
+  <\/script>
+</body></html>`;
 
-  <script>
-    document.addEventListener("contextmenu", function(e) { e.preventDefault(); });
+    const frame = document.getElementById('game-frame');
+    const doc = frame.contentDocument || frame.contentWindow.document;
+    doc.open(); doc.write(inner); doc.close();
+    frame.addEventListener('pointerdown', () => frame.focus(), {capture:true});
   </script>
 
 </body>
