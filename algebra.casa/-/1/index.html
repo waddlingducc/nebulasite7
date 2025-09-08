@@ -79,7 +79,7 @@
     /* Floating right ad */
     .side-ad {
   position: fixed;
-  top: 0;
+  top: 0px;
   right: 0;
   width: 300px;
   height: 600px;
@@ -96,9 +96,21 @@
 <body>
 
   <nav>
-    <a href="/algebra.casa/"><img alt="logo" src="/images/logo.png"/></a>
-    <h3>www.Algebra.Casa</h3>
-  </nav>
+      <a class="logo-link" data-href="/" style="cursor:pointer;">
+        <img src="/images/logo.png" alt="logo">
+      </a>
+
+      <script>
+        document.querySelectorAll('.logo-link').forEach(link => {
+          link.addEventListener('click', e => {
+            e.preventDefault(); // stops new tab or default <a> behavior
+            window.location.href = link.dataset.href; // always same tab
+          });
+        });
+      </script>
+
+      <h3>www.NebulaPlay.Site</h3>
+    </nav>
 
   <div class="content">
     <!-- Game -->
@@ -110,7 +122,7 @@
   </div>
 
   <!-- Floating Right Vertical Ad -->
-  <aside class="side-ad" style="top: 0;">
+  <aside class="side-ad">
     <ins class="adsbygoogle"
          style="display:inline-block;width:300px;height:600px"
          data-ad-client="ca-pub-2366308143645027"
