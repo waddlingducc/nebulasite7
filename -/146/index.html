@@ -163,10 +163,19 @@
 
 <body>
   <nav>
-    <!-- These are set to your current origin at runtime to ignore any <base> -->
-    <a class="site-home" href="#">
-      <img class="site-logo" alt="logo" src="#">
+    <a class="logo-link" data-href="/" style="cursor:pointer;">
+      <img src="/images/logo.png" alt="logo">
     </a>
+
+    <script>
+      document.querySelectorAll('.logo-link').forEach(link => {
+        link.addEventListener('click', e => {
+          e.preventDefault(); // stops new tab or default <a> behavior
+          window.location.href = link.dataset.href; // always same tab
+        });
+      });
+    </script>
+
     <h3>www.NebulaPlay.Site</h3>
   </nav>
 
@@ -213,47 +222,5 @@
       if (req) req.call(gameWrap);
     });
   </script>
-    <!-- Put this right after your #games block (or before </body>) -->
-<script>
-(function () {
-  const links = document.querySelectorAll('#games a');
-
-  links.forEach(a => {
-    // 1) If it still uses onclick="window.location.href='...'"
-    const oc = a.getAttribute('onclick');
-    if (oc) {
-      const match = oc.match(/window\.location\.href\s*=\s*['"]([^'"]+)['"]/);
-      if (match && match[1]) {
-        a.dataset.href = match[1];   // stash the target URL
-      }
-      a.removeAttribute('onclick');   // clean inline handler
-    }
-
-    // 2) Accessibility (works like a real link)
-    if (!a.hasAttribute('tabindex')) a.setAttribute('tabindex', '0');
-    if (!a.hasAttribute('role')) a.setAttribute('role', 'link');
-
-    // 3) Intercept clicks to force same-tab nav
-    a.addEventListener('click', e => {
-      // Block middle-click or modifier keys (Cmd/Ctrl/Shift/Alt)
-      if (e.button === 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
-        e.preventDefault();
-      } else {
-        e.preventDefault();
-      }
-      if (a.dataset.href) window.location.assign(a.dataset.href);
-    });
-
-    // 4) Keyboard support (Enter / Space)
-    a.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        if (a.dataset.href) window.location.assign(a.dataset.href);
-      }
-    });
-  });
-})();
-</script>
-
 </body>
 </html>
